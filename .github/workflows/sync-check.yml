@@ -1,0 +1,22 @@
+name: Mirror to CNB
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to CNB
+        run: |
+          . ./.sync-config
+          CNB_URL="https://cnb:${{ secrets.CNB_TOKEN }}@cnb.cool/$TARGET_CNB_SLUG.git"
+          echo "=== Mirroring to CNB ==="
+          git push "$CNB_URL" "$GITHUB_REF"
+          echo "Mirror done"

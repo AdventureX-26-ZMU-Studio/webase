@@ -1,0 +1,3 @@
+TARGET_GITHUB_REPO=https://github.com/AdventureX-26-ZMU-Studio/webase.git
+TARGET_CNB_SLUG=buzhi/ZMU/webase
+MAIN_BRANCH=main
