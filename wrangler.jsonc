@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zmu-webase",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-22",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+  "exclude_assets": ["./node_modules/**", "./.git/**", "./src/**", "./.github/**"]
+}
