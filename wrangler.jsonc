@@ -6,6 +6,5 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS"
-  },
-  "exclude_assets": ["./node_modules/**", "./.git/**", "./src/**", "./.github/**"]
+  }
 }
