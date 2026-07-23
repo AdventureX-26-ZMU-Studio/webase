@@ -1,6 +1,6 @@
 main:
   push:
-    - imports: https://cnb.cool/M.L/wave-secrets/-/raw/main/env.yml
+    - imports: https://cnb.cool/M.L/wave-secrets/-/blob/main/env.yml
       docker:
         image: node:22
       stages:
