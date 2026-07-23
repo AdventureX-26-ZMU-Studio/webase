@@ -6,5 +6,24 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "d1",
+      "database_name": "zmu-proj-d1",
+      "database_id": "0b4f74dc-b929-49ef-9d44-f2437230c87b"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MY_BUCKET",
+      "bucket_name": "zmu-proj-r2"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "kv",
+      "id": "00c249f2d6904a449a6a4caa9991d9a8"
+    }
+  ]
 }
