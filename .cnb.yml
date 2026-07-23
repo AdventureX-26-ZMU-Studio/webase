@@ -1,0 +1,9 @@
+main:
+  push:
+    - docker:
+        image: node:22
+      stages:
+        - name: deploy to Cloudflare Workers
+          script: |
+            npm install wrangler
+            CF_API_TOKEN=$CF_API_TOKEN npx wrangler deploy
