@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import type { AppEnv, UserRecord } from "../env";
 import { hashPassword, verifyPassword } from "../lib/password";
+import { ensureAuthSchema } from "../lib/schema";
 import { sessionCookieName, sessionPrefix } from "../middleware/auth";
 
 const sessionTtlSeconds = 60 * 60 * 24 * 7;
@@ -12,6 +13,7 @@ authRoutes.post("/register", async (c) => {
   const body = await readAuthBody(c.req.raw);
   if (!body.ok) return c.json({ error: body.error }, 400);
 
+  await ensureAuthSchema(c.env.d1);
   const existing = await findUserByEmail(c.env.d1, body.email);
   if (existing) return c.json({ error: "Email already registered" }, 409);
 
@@ -30,6 +32,7 @@ authRoutes.post("/login", async (c) => {
   const body = await readAuthBody(c.req.raw);
   if (!body.ok) return c.json({ error: body.error }, 400);
 
+  await ensureAuthSchema(c.env.d1);
   const user = await findUserByEmail(c.env.d1, body.email);
   if (!user) return c.json({ error: "Invalid email or password" }, 401);
 
@@ -54,6 +57,7 @@ authRoutes.get("/me", async (c) => {
   const userId = await c.env.kv.get(`${sessionPrefix}${sessionId}`);
   if (!userId) return c.json({ user: null });
 
+  await ensureAuthSchema(c.env.d1);
   const user = await c.env.d1
     .prepare("SELECT id, email, created_at FROM users WHERE id = ?")
     .bind(userId)

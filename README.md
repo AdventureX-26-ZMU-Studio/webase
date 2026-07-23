@@ -42,7 +42,9 @@ npm run deploy
 
 The deploy script builds Vite first, then deploys the Worker with assets.
 
-Apply remote D1 migrations before testing production auth:
+The Worker also creates the minimal auth table with `CREATE TABLE IF NOT EXISTS`
+when auth/admin routes are used. Remote migrations are still kept for explicit
+database management:
 
 ```bash
 npx wrangler d1 migrations apply zmu-proj-d1 --remote
