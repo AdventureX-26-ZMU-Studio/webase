@@ -18,13 +18,15 @@ authRoutes.post("/register", async (c) => {
   if (existing) return c.json({ error: "Email already registered" }, 409);
 
   const userId = crypto.randomUUID();
-  const passwordHash = await hashPassword(body.password);
-  await c.env.d1
-    .prepare("INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)")
-    .bind(userId, body.email, passwordHash)
-    .run();
+  const passwordHash = await withAuthStep("hash password", () => hashPassword(body.password));
+  await withAuthStep("insert user", () =>
+    c.env.d1
+      .prepare("INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)")
+      .bind(userId, body.email, passwordHash)
+      .run(),
+  );
 
-  await createSession(c, userId);
+  await withAuthStep("create session", () => createSession(c, userId));
   return c.json({ user: { id: userId, email: body.email } }, 201);
 });
 
@@ -36,10 +38,10 @@ authRoutes.post("/login", async (c) => {
   const user = await findUserByEmail(c.env.d1, body.email);
   if (!user) return c.json({ error: "Invalid email or password" }, 401);
 
-  const passwordOk = await verifyPassword(body.password, user.password_hash);
+  const passwordOk = await withAuthStep("verify password", () => verifyPassword(body.password, user.password_hash));
   if (!passwordOk) return c.json({ error: "Invalid email or password" }, 401);
 
-  await createSession(c, user.id);
+  await withAuthStep("create session", () => createSession(c, user.id));
   return c.json({ user: { id: user.id, email: user.email } });
 });
 
@@ -81,10 +83,12 @@ async function createSession(c: Parameters<typeof setCookie>[0], userId: string)
 }
 
 async function findUserByEmail(d1: D1Database, email: string): Promise<UserRecord | null> {
-  return d1
-    .prepare("SELECT id, email, password_hash, created_at FROM users WHERE email = ?")
-    .bind(email)
-    .first<UserRecord>();
+  return withAuthStep("find user by email", () =>
+    d1
+      .prepare("SELECT id, email, password_hash, created_at FROM users WHERE email = ?")
+      .bind(email)
+      .first<UserRecord>(),
+  );
 }
 
 async function readAuthBody(request: Request): Promise<
@@ -105,4 +109,13 @@ async function readAuthBody(request: Request): Promise<
   }
 
   return { ok: true, email, password };
+}
+
+async function withAuthStep<T>(name: string, operation: () => Promise<T>): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`auth:${name} failed: ${message}`);
+  }
 }

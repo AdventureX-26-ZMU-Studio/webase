@@ -16,12 +16,14 @@ app.onError((error, c) => {
   return c.json(
     {
       error: "Internal Server Error",
+      route: c.req.path,
       message: error instanceof Error ? error.message : String(error),
     },
     500,
   );
 });
 
-app.notFound((c) => c.env.ASSETS.fetch(c.req.raw));
+// Only /api/* reaches this fallback because assets handles page routes first.
+app.notFound((c) => c.json({ error: "Not found" }, 404));
 
 export default app;

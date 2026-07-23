@@ -160,10 +160,18 @@ async function apiPost<T = unknown>(
 async function readApiResponse<T>(response: Response): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = data && typeof data === "object" && "error" in data ? String(data.error) : response.statusText;
+    const message = formatApiError(data, response.statusText);
     return { ok: false, error: message };
   }
   return { ok: true, data: data as T };
+}
+
+function formatApiError(data: unknown, fallback: string): string {
+  if (!data || typeof data !== "object") return fallback;
+  const fields = data as { error?: unknown; message?: unknown };
+  const error = typeof fields.error === "string" ? fields.error : fallback;
+  const detail = typeof fields.message === "string" ? fields.message : "";
+  return detail ? `${error}: ${detail}` : error;
 }
 
 function escapeHtml(value: string): string {
