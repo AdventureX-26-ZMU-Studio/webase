@@ -2,6 +2,8 @@ FROM node:22
 
 RUN apt-get update && apt-get install -y wget openssh-server && rm -rf /var/lib/apt/lists/*
 
+RUN npm install -g wrangler
+
 RUN mkdir -p /ide_cnb
 
 RUN wget -q https://download.jetbrains.com/webstorm/WebStorm-2025.2.5.tar.gz \
