@@ -4,7 +4,8 @@ main:
       docker:
         image: node:22
       stages:
-        - name: deploy to Cloudflare Workers
+        - name: migrate and deploy to Cloudflare Workers
           script: |
-            npm install -g wrangler
-            CLOUDFLARE_API_TOKEN=$CLOUDFLARE_WORKER_APIKEY wrangler deploy
+            npm ci
+            CLOUDFLARE_API_TOKEN=$CLOUDFLARE_WORKER_APIKEY npx wrangler d1 migrations apply zmu-proj-d1 --remote
+            CLOUDFLARE_API_TOKEN=$CLOUDFLARE_WORKER_APIKEY npm run deploy

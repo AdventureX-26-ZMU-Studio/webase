@@ -1,9 +1,63 @@
-# Webase
+# ZMU Webase
 
-> ZMU Studio · Web 基础设施
+ZMU Studio backend foundation on Cloudflare Workers.
 
-Webase（Web + Base）是 ZMU Studio 的 Web 基础项目，包含前端、后端、部署等通用基础设施脚手架和规范。
+## Architecture
 
-## 目录
+- Frontend: Vite, built to `dist/client`
+- Backend: Hono Worker at `src/worker/index.ts`
+- Static assets: served through `env.ASSETS`
+- Storage bindings:
+  - D1: `env.d1`
+  - KV: `env.kv`
+  - R2: `env.MY_BUCKET`
 
-_建设中_
+## Development
+
+```bash
+npm run dev
+```
+
+Runs the Vite frontend server for quick interface work.
+
+```bash
+npm run worker:dev
+```
+
+Builds the frontend, then runs the full Worker on port `8787` with Hono APIs and Cloudflare local bindings.
+
+Apply local D1 migrations before testing auth:
+
+```bash
+npx wrangler d1 migrations apply zmu-proj-d1 --local
+```
+
+Use `wrangler dev --remote` only when you intentionally want to touch remote Cloudflare resources.
+
+## Deployment
+
+```bash
+npm run deploy
+```
+
+The deploy script builds Vite first, then deploys the Worker with assets.
+
+Apply remote D1 migrations before testing production auth:
+
+```bash
+npx wrangler d1 migrations apply zmu-proj-d1 --remote
+```
+
+## Route Geometry
+
+- `/` - backend console shell
+- `/auth` - frontend route handled by Vite assets fallback
+- `/storage` - frontend route handled by Vite assets fallback
+- `/settings` - frontend route handled by Vite assets fallback
+- `/api/health` - health check
+- `/api/auth/register` - create user and session
+- `/api/auth/login` - create session
+- `/api/auth/logout` - destroy session
+- `/api/auth/me` - current user
+- `/api/admin/overview` - protected backend panel summary
+- `/api/r2/:key` - protected R2 request-backed object entry
