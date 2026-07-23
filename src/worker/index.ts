@@ -12,6 +12,16 @@ app.route("/api/auth", authRoutes);
 app.route("/api/admin", adminRoutes);
 app.route("/api/r2", r2Routes);
 
+app.onError((error, c) => {
+  return c.json(
+    {
+      error: "Internal Server Error",
+      message: error instanceof Error ? error.message : String(error),
+    },
+    500,
+  );
+});
+
 app.notFound((c) => c.env.ASSETS.fetch(c.req.raw));
 
 export default app;
