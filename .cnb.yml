@@ -6,5 +6,5 @@ main:
       stages:
         - name: deploy to Cloudflare Workers
           script: |
-            npm install wrangler
-            CLOUDFLARE_API_TOKEN=$CLOUDFLARE_WORKER_APIKEY npx wrangler deploy
+            npm install -g wrangler
+            CLOUDFLARE_API_TOKEN=$CLOUDFLARE_WORKER_APIKEY wrangler deploy
